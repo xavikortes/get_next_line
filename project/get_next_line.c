@@ -6,25 +6,33 @@
 /*   By: jcortes <jcortes@student.42madrid.com      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/29 11:36:44 by jcortes           #+#    #+#             */
-/*   Updated: 2026/09/29 12:28:12 by jcortes          ###   ########.fr       */
+/*   Updated: 2026/09/29 12:47:50 by jcortes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+
+
 char	*get_next_line(int fd)
 {
-	char		*buff;
+	char	*buff;
+	size_t	size;
+	ssize_t	bytes_read;	
 
-	buff = (char *) malloc(BUFFER_SIZE * sizeof(char));
+	size = BUFFER_SIZE || 100;
+	buff = (char *) malloc(size * sizeof(char));
 	if (buff == NULL)
 		return (NULL);
-	read(fd, buff, BUFFER_SIZE);
-	buff[BUFFER_SIZE] = '\0';
+	bytes_read = read(fd, buff, size - 1);
+	if (bytes_read == 0)
+		return (buff);
+	buff[size] = '\0';
+	endl_idx = find_endl(buff, size);
 	return (buff);
 }
 
-/*int	error(int fd)
+int	error(int fd)
 {
 	if (fd != -1)
 		close(fd);
@@ -54,4 +62,4 @@ int	main(void)
 	free(str);
 	close(fd);
 	close(fd2);
-}*/
+}
