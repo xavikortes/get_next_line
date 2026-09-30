@@ -6,7 +6,7 @@
 /*   By: jcortes <jcortes@student.42madrid.com      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/29 11:35:19 by jcortes           #+#    #+#             */
-/*   Updated: 2026/09/29 18:53:19 by jcortes          ###   ########.fr       */
+/*   Updated: 2026/09/30 09:18:55 by jcortes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,10 @@
 #  define BUFFER_SIZE 42
 # endif
 
+# ifndef MAX_FDS
+#  define MAX_FDS 1024
+# endif
+
 # include <unistd.h>
 # include <stdlib.h>
 # include <fcntl.h>
@@ -24,7 +28,7 @@
 size_t		ft_strlen(const char *str);
 char		*ft_substr(char const *s, unsigned int start, size_t len);
 char		*ft_strdup(char const *str);
-char		*ft_strjoin(char const *s1, char const *s2);
+char		*ft_strjoin(char *s1, char *s2);
 char		*ft_strchr(const char *str, int c);
 
 char		*get_next_line(int fd);

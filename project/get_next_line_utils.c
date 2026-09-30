@@ -6,7 +6,7 @@
 /*   By: jcortes <jcortes@student.42madrid.com      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/29 18:55:50 by jcortes           #+#    #+#             */
-/*   Updated: 2026/09/29 19:07:52 by jcortes          ###   ########.fr       */
+/*   Updated: 2026/09/30 09:41:05 by jcortes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*ft_strdup(const char *str)
 	len = ft_strlen(str);
 	ptr = malloc(len + 1);
 	if (ptr == NULL)
-		return (ptr);
+		return (NULL);
 	while (str[i] != '\0')
 	{
 		ptr[i] = str[i];
@@ -51,13 +51,11 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	if (s == NULL)
 		return (NULL);
 	str_len = ft_strlen(s);
-	if (start > str_len)
-		return (malloc(1));
-	str_len -= start;
-	if (len > str_len)
-		new = malloc(str_len + 1);
-	else
-		new = malloc(len + 1);
+	if (start >= str_len)
+		str_len = 0;
+	else if (len > str_len - start)
+		len = str_len - start;
+	new = malloc(len + 1);
 	if (new == NULL)
 		return (NULL);
 	i = 0;
@@ -70,7 +68,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (new);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*new;
 	size_t	i;
@@ -78,7 +76,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	if (s1 == NULL || s2 == NULL)
 		return (NULL);
-	new = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	new = (char *) malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (new == NULL)
 		return (NULL);
 	i = 0;
@@ -93,7 +91,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		new[i + j] = s2[j];
 		j++;
 	}
-	new[i] = '\0';
+	new[i + j] = '\0';
+	free(s1);
 	return (new);
 }
 

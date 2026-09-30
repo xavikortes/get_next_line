@@ -6,129 +6,90 @@
 /*   By: jcortes <jcortes@student.42madrid.com      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/29 11:36:44 by jcortes           #+#    #+#             */
-/*   Updated: 2026/09/29 17:01:45 by jcortes          ###   ########.fr       */
+/*   Updated: 2026/09/30 09:29:05 by jcortes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	find_endl(char *str, size_t size)
+char	*free_buff(char *buff)
 {
-	int	i;
-
-	i = 0;
-	while (str[i] != '\0' && (size_t) i < size)
-	{
-		if (str[i] == '\n')
-			return (i);
-		i++;
-	}
-	return (-1);
-}
-
-char	*read_into_buffer(int fd)
-{
-	char	*buff;
-	ssize_t	bytes_read;
-
-	buff = (char *) malloc(BUFFER_SIZE);
-	if (buff)
-		return (NULL);
-	bytes_read = read(fd, buff, BUFFER_SIZE);
-	if (bytes_read < 0)
+	if (buff != NULL)
 	{
 		free(buff);
-		return(NULL);
+		buff = NULL;
 	}
-	buff[bytes_read] = '\0';
-	return (buff);
+	return (NULL);
 }
 
-char	*get_buffer(int fd)
+char	*read_into_buffer(int fd, char *buff)
 {
-	int			endl_idx;
-	char		*buff;
-	char		*res;
-	static char	*prev;
+	char	*tmp;
+	ssize_t	bytes_read;
 
-	if (prev == NULL)
+	if (buff == NULL)
+		buff = ft_strdup("");
+	tmp = (char *) malloc(BUFFER_SIZE + 1);
+	if (tmp == NULL)
+		return (free_buff(buff));
+	while (buff != NULL && ft_strchr(buff, '\n') == NULL)
 	{
-		prev = malloc(BUFFER_SIZE);
-		if (prev == NULL)
-			return (NULL);
-		prev[0] = '\0';
+		bytes_read = read(fd, tmp, BUFFER_SIZE);
+		if (bytes_read < 0)
+			return (free_buff(buff), free_buff(tmp));
+		if (bytes_read == 0)
+		{
+			if (buff[0] == '\0')
+				return (free_buff(tmp), buff);
+			break ;
+		}
+		tmp[bytes_read] = '\0';
+		buff = ft_strjoin(buff, tmp);
+		if (buff == NULL)
+			return (free_buff(buff), free_buff(tmp));
 	}
-	if (ft_strlen(prev) > 0)
+	return (free_buff(tmp), buff);
+}
+
+char	*find_endl(char **buff)
+{
+	char	*line;
+	char	*rest;
+	char	*endl;
+
+	if (buff == NULL || *buff == NULL)
+		return (NULL);
+	endl = ft_strchr(*buff, '\n');
+	if (endl != NULL)
 	{
-		buff = ft_strdup(prev);
-		prev[0] = '\0';
+		line = ft_substr(*buff, 0, endl - *buff + 1);
+		rest = ft_strdup(endl + 1);
+		free(*buff);
+		*buff = rest;
+		if (line == NULL)
+			return (free_buff(line));
 	}
 	else
-		buff = read_into_buffer(fd);
-	endl_idx = find_endl(buff, BUFFER_SIZE);
-	if (endl_idx == -1)
-		return (buff);
-	prev = ft_substr(buff, endl_idx + 1, BUFFER_SIZE);
-	res = ft_substr(buff, 0, endl_idx);
-	free(buff);
-	return (res);
+	{
+		line = ft_strdup(*buff);
+		free(*buff);
+		*buff = NULL;
+	}
+	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	char		*buff;
 	char		*next;
-	char		*res;
-	int			endl_idx;
+	static char	*buffs[MAX_FDS];
 
-	buff = get_buffer(fd);
-	if (buff == NULL)
+	if (fd < 0 || fd > MAX_FDS || BUFFER_SIZE <= 0)
 		return (NULL);
-	endl_idx = find_endl(buff, BUFFER_SIZE);
-	if (endl_idx == -1)
-	{
-		next = get_buffer(fd);
-		if (next == NULL)
-		{
-			free(buff);
-			return (NULL);
-		}
-		res = ft_strjoin(buff, next);
-		free(buff);
-		free(next);
-		return (res);
-	}
-	return (buff);
+	buffs[fd] = read_into_buffer(fd, buffs[fd]);
+	if (buffs[fd] == NULL)
+		return (NULL);
+	next = find_endl(&buffs[fd]);
+	if (next != NULL && next[0] == '\0')
+		return (free_buff(next));
+	return (next);
 }
-
-/*int	error(int fd)
-{
-	if (fd != -1)
-		close(fd);
-	return (1);
-}
-
-int	main(void)
-{
-	#include <stdio.h>
-	int fd = open("./project/get_next_line.h", O_RDONLY);
-	if (fd == -1)
-		return (error(fd));
-	int fd2 = open("./project/get_next_line.c", O_RDONLY);
-	if (fd2 == -1)
-		return (error(fd2));
-	char *str;
-	for (int i = 0; i < 20; i++)
-	{
-		if (i % 2 == 0)
-			str = get_next_line(fd);
-		else
-			str = get_next_line(fd2);
-   		 if (str == NULL)
-    	    return (error(fd));
-	    printf("'%s'\n", str);
-	}
-	free(str);
-	close(fd);
-	close(fd2);
-}*/
