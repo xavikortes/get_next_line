@@ -6,7 +6,7 @@
 /*   By: jcortes <jcortes@student.42madrid.com      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/29 11:36:44 by jcortes           #+#    #+#             */
-/*   Updated: 2026/09/30 12:06:28 by jcortes          ###   ########.fr       */
+/*   Updated: 2026/09/30 12:28:07 by jcortes          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ char	*get_next_line(int fd)
 	if (buffs[fd] == NULL)
 		return (NULL);
 	next = find_endl(&buffs[fd]);
-	if (next != NULL && next[0] == '\0')
+	if (next == NULL || next[0] == '\0')
 		return (free_buff(next));
 	return (next);
 }
